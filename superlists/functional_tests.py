@@ -31,8 +31,12 @@ class NewVisitorTest(unittest.TestCase):
 
         # When she hits enter, the page updates and lists "1. Buy peacock feathers"
         inputbox.send_keys(Keys.ENTER)
+
+        # import time
+        # time.sleep(10)
+
         table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_name('tr')
+        rows = table.find_elements_by_tag_name('tr')
         self.assertIn(
             "1: Buy peacock feathers",
             [row.text for row in rows]
@@ -41,13 +45,12 @@ class NewVisitorTest(unittest.TestCase):
         # There is still a text box inviting her to enter another to-do
         # She enters "Use feathers to make a fly"
         inputbox = self.browser.find_element_by_id('id_new_item')
-        inputbox = self.browser.find_element_by_id('id_new_item')
         inputbox.send_keys('Use feathers to make a fly')
         inputbox.send_keys(Keys.ENTER)
 
         # The page updates again, and now shows both items on her list
         table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_name('tr')
+        rows = table.find_elements_by_tag_name('tr')
         self.assertIn(
             "2: Use feathers to make a fly",
             [row.text for row in rows]

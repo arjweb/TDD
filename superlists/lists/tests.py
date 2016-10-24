@@ -3,6 +3,7 @@ from django.http import HttpRequest
 from django.template.loader import render_to_string
 
 from lists.views import home_page
+from lists.models import Item
 
 
 # Create your tests here.
@@ -28,13 +29,40 @@ class HomePageTest(TestCase):
         #     expected_content = f.read()
         # self.assertEqual(response.content.decode(), expected_content)
 
-    def test_home_page_can_remember_post_requests(self):
+    def test_home_page_shows_items_in_database(self):
+        Item.objects.create(text='item 1')
+        Item.objects.create(text='item 2')
+        request = HttpRequest()
+        response = home_page(request)
+        self.assertIn('item 1', response.content.decode())
+        self.assertIn('item 2', response.content.decode())
+
+    def test_home_page_can_save_post_requests(self):
         # Builds a request to simulate a form post
         request = HttpRequest()
         request.method = 'POST'
         request.POST['item_text'] = 'A new item'
         # Passes to home_page view and captures response
         response = home_page(request)
-        # Checks response for text that was passed via POST
-        self.assertIn('A new item', response.content.decode())
+        # Check in database
+        item_from_db = Item.objects.all()[0]
+        self.assertEqual(item_from_db.text, 'A new item')
+        # Checks for redirect after POST (good behaviour!)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], '/')
 
+
+class ItemModelText(TestCase):
+    def test_saving_and_retrieving_items_in_database(self):
+        first_item = Item()
+        first_item.text = 'Item the first'
+        first_item.save()
+
+        second_item = Item()
+        second_item.text = 'second item'
+        second_item.save()
+
+        first_item_from_db = Item.objects.all()[0]
+        self.assertEqual(first_item_from_db.text, 'Item the first')
+        second_item_from_db = Item.objects.all()[1]
+        self.assertEqual(second_item_from_db.text, 'second item')

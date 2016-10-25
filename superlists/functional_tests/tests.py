@@ -47,7 +47,6 @@ class NewVisitorTest(LiveServerTestCase):
 
         self.check_for_row_in_list_table("1: Buy peacock feathers")
 
-
         # There is still a text box inviting her to enter another to-do
         # She enters "Use feathers to make a fly"
         inputbox = self.browser.find_element_by_id('id_new_item')
@@ -58,13 +57,43 @@ class NewVisitorTest(LiveServerTestCase):
         self.check_for_row_in_list_table("2: Use feathers to make a fly")
         self.check_for_row_in_list_table("1: Buy peacock feathers")
 
+        # Edith sees her list has a unique URL
+        edith_list_url = self.browser.current_url
+        self.assertRegex(edith_list_url, '/lists/.+')
+
+        # Now a new user, Francis, comes along to the site
+        # # We use a new browser session so no cookies shared etc.
+        self.browser.quit()
+        self.browser = webdriver.Chrome()
+
+        # Francis visits the home page, and there is no trace of Edith's list
+        self.browser.get(self.live_server_url)
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn('Buy peacock feathers', page_text)
+        self.assertNotIn('make a fly', page_text)
+
+        # Francis starts a new list by entering a new item
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('Buy milk')
+        inputbox.send_keys(Keys.ENTER)
+
+        # Francis gets his own unique URL
+        francis_list_url = self.browser.current_url
+        self.assertRegex(francis_list_url, '/lists/.+')
+        self.assertNotEqual(francis_list_url, edith_list_url)
+
+        # Again no sign of Edith's content
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn('Buy peacock feathers', page_text)
+        self.assertIn('Buy milk', page_text)
+
         # Edith wonders whether the site will remember her list.  She sees there is a
         # unique url for her
         self.fail('Finish the test')
 
         # She visits that url and her list is still there
 
-        # Satisfied, she goes to sleep
+        # Satisfied, they both go to sleep
 
 
 if __name__ == '__main__':

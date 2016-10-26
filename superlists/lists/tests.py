@@ -29,23 +29,23 @@ class HomePageTest(TestCase):
         #     expected_content = f.read()
         # self.assertEqual(response.content.decode(), expected_content)
 
-    def test_home_page_can_save_post_requests(self):
+
+class NewListViewTest(TestCase):
+    def test_can_save_post_requests(self):
         # Builds a request to simulate a form post
-        request = HttpRequest()
-        request.method = 'POST'
-        request.POST['item_text'] = 'A new item'
-        # Passes to home_page view and captures response
-        response = home_page(request)
+        self.client.post('/lists/new', {'item_text': 'A new item'})
         # Check in database
         item_from_db = Item.objects.all()[0]
         self.assertEqual(item_from_db.text, 'A new item')
+
+    def test_redirects_to_url(self):
+        response = self.client.post('/lists/new', {'item_text': 'A new item'})
         # Checks for redirect after POST (good behaviour!)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], '/lists/the-only-list-in-the-world/')
+        self.assertRedirects(response, '/lists/the-only-list-in-the-world/')
 
 
 class ListViewTest(TestCase):
-
     def test_lists_page_shows_items_in_database(self):
         Item.objects.create(text='item 1')
         Item.objects.create(text='item 2')

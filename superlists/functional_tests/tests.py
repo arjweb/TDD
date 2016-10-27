@@ -1,12 +1,10 @@
 import unittest
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-from  django.test import LiveServerTestCase
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 
 
-# Firefox does not work, not fully installed..
-
-class NewVisitorTest(LiveServerTestCase):
+class NewVisitorTest(StaticLiveServerTestCase):
     def setUp(self):
         self.browser = webdriver.Chrome()
         self.browser.implicitly_wait(3)  # To avoid issues if browser can't keep up with tests
@@ -45,7 +43,6 @@ class NewVisitorTest(LiveServerTestCase):
             512,
             delta=5
         )
-
 
     def test_starting_a_new_todo_list(self):
         # Edith has heard of a great website on to to lists and goes to homepage

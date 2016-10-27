@@ -23,6 +23,30 @@ class NewVisitorTest(LiveServerTestCase):
             [row.text for row in rows]
         )
 
+    # -----------------------------------------------------------
+
+    def test_layout_and_styling(self):
+        # Edith goes to the home page
+        self.browser.get(self.live_server_url)
+        self.browser.set_window_size(1024, 768)
+
+        # She notices the input box is nicely centred
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        self.assertAlmostEqual(
+            inputbox.location['x'] + inputbox.size['width'] / 2,
+            512, delta=5
+        )
+        # She starts a new list and sees the input is nicely
+        # centered there too
+        inputbox.send_keys('testing\n')
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        self.assertAlmostEqual(
+            inputbox.location['x'] + inputbox.size['width'] / 2,
+            512,
+            delta=5
+        )
+
+
     def test_starting_a_new_todo_list(self):
         # Edith has heard of a great website on to to lists and goes to homepage
         self.browser.get(self.live_server_url)
@@ -89,7 +113,7 @@ class NewVisitorTest(LiveServerTestCase):
 
         # Edith wonders whether the site will remember her list.  She sees there is a
         # unique url for her
-        self.fail('Finish the test')
+        # self.fail('Finish the test')
 
         # She visits that url and her list is still there
 
